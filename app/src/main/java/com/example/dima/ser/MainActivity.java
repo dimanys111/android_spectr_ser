@@ -1,7 +1,9 @@
 package com.example.dima.ser;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -35,21 +37,23 @@ import static java.lang.Math.pow;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
 
+import androidx.core.app.ActivityCompat;
+
 
 public class MainActivity extends Activity {
-    AudioRecord audioRecord=null;
+    AudioRecord audioRecord = null;
     boolean isReading = false;
     boolean avto = true;
 
     double TwoPi = 6.283185307179586;
 
-    double linchast=0;
+    double linchast = 0;
 
-    double predOt=0;
-    double predDoo=4000;
+    double predOt = 0;
+    double predDoo = 4000;
 
-    double predDooSpek=4000;
-    double predDooAmpl=4000;
+    double predDooSpek = 4000;
+    double predDooAmpl = 4000;
 
     DrawView draw;
     RelativeLayout vd;
@@ -64,15 +68,15 @@ public class MainActivity extends Activity {
     int sm;
     String[] data = {"E", "A", "D", "G", "B", "e", "Весь диапазон"};
 
-    ArrayList<Double> FFTAnalysis(ArrayList<Double> ghj)  {
+    ArrayList<Double> FFTAnalysis(ArrayList<Double> ghj) {
         int i, j, n, m, Mmax, Istp;
         double Tmpr, Tmpi, Wtmp, Theta;
         double Wpr, Wpi, Wr, Wi;
         double[] Tmvl;
 
-        int Nvl=ghj.size();
+        int Nvl = ghj.size();
 
-        if (ghj.size()>0) {
+        if (ghj.size() > 0) {
             n = Nvl * 2;
             Tmvl = new double[n];
 
@@ -137,7 +141,7 @@ public class MainActivity extends Activity {
                 Mmax = Istp;
             }
 
-            Nvl=Nvl/2;
+            Nvl = Nvl / 2;
 
             ArrayList<Double> FTvl;
             FTvl = new ArrayList<>();
@@ -146,7 +150,7 @@ public class MainActivity extends Activity {
             }
 
             for (i = 0; i < Nvl; i++) {
-                j = Nvl*2+i * 2;
+                j = Nvl * 2 + i * 2;
                 FTvl.set(Nvl - i - 1, sqrt(pow(Tmvl[j], 2) + pow(Tmvl[j + 1], 2)));
             }
             return FTvl;
@@ -160,18 +164,18 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        vd=(RelativeLayout)findViewById(R.id.rty);
-        draw=new DrawView(this);
+        vd = (RelativeLayout) findViewById(R.id.rty);
+        draw = new DrawView(this);
         vd.addView(draw);
 
-        e=(EditText)findViewById(R.id.editText);
+        e = (EditText) findViewById(R.id.editText);
 
         e.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
                 try {
-                    linchast=Float.valueOf(s.toString());
-                } catch( NumberFormatException  e){
+                    linchast = Float.valueOf(s.toString());
+                } catch (NumberFormatException e) {
                     Toast.makeText(getBaseContext(), "Ошибка ввода = " + s, Toast.LENGTH_SHORT).show();
                 }
                 // Прописываем то, что надо выполнить после изменения текста
@@ -186,14 +190,14 @@ public class MainActivity extends Activity {
             }
         });
 
-        t1=(EditText)findViewById(R.id.editText2);
+        t1 = (EditText) findViewById(R.id.editText2);
 
         t1.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
                 try {
                     predOt = Float.valueOf(s.toString());
-                    if (predDoo<=predOt) {
+                    if (predDoo <= predOt) {
                         predOt = predDoo - 1;
                         t1.setText(String.valueOf(predOt));
                     }
@@ -212,14 +216,14 @@ public class MainActivity extends Activity {
         });
 
 
-        t2=(EditText)findViewById(R.id.editText3);
+        t2 = (EditText) findViewById(R.id.editText3);
 
         t2.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
                 try {
                     predDoo = Float.valueOf(s.toString());
-                    if (predDoo<=predOt) {
+                    if (predDoo <= predOt) {
                         predDoo = predOt + 1;
                         t2.setText(String.valueOf(predDoo));
                     }
@@ -238,7 +242,7 @@ public class MainActivity extends Activity {
         });
 
 
-        t3=(EditText)findViewById(R.id.editText4);
+        t3 = (EditText) findViewById(R.id.editText4);
 
         t3.addTextChangedListener(new TextWatcher() {
             @Override
@@ -259,7 +263,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        t4=(EditText)findViewById(R.id.editText5);
+        t4 = (EditText) findViewById(R.id.editText5);
 
         t4.addTextChangedListener(new TextWatcher() {
             @Override
@@ -281,22 +285,22 @@ public class MainActivity extends Activity {
         });
 
 
-        b1=(Button)findViewById(R.id.button2);
+        b1 = (Button) findViewById(R.id.button2);
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                avto=!avto;
+                avto = !avto;
             }
         });
 
-        b=(Button)findViewById(R.id.button);
+        b = (Button) findViewById(R.id.button);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String s=e.getText().toString();
+                String s = e.getText().toString();
                 try {
-                    linchast=Float.valueOf(s);
-                } catch( NumberFormatException  e){
+                    linchast = Float.valueOf(s);
+                } catch (NumberFormatException e) {
                     Toast.makeText(getBaseContext(), "Ошибка ввода = " + s, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -320,46 +324,48 @@ public class MainActivity extends Activity {
                 switch (position) {
                     case 0:
                         linchast = 82.41;
-                        predOt=50;
-                        predDoo=100;
+                        predOt = 50;
+                        predDoo = 100;
                         break;
                     case 1:
                         linchast = 110.00;
-                        predOt=100;
-                        predDoo=120;
+                        predOt = 100;
+                        predDoo = 120;
                         break;
                     case 2:
                         linchast = 146.82;
-                        predOt=120;
-                        predDoo=170;
+                        predOt = 120;
+                        predDoo = 170;
                         break;
                     case 3:
                         linchast = 196.00;
-                        predOt=170;
-                        predDoo=220;
+                        predOt = 170;
+                        predDoo = 220;
                         break;
                     case 4:
                         linchast = 246.94;
-                        predOt=220;
-                        predDoo=270;
+                        predOt = 220;
+                        predDoo = 270;
                         break;
                     case 5:
                         linchast = 329.63;
-                        predOt=270;
-                        predDoo=370;
+                        predOt = 270;
+                        predDoo = 370;
                         break;
                     case 6:
                         linchast = 2000;
-                        predOt=0;
-                        predDoo=4000;
+                        predOt = 0;
+                        predDoo = 4000;
                         break;
-                    default: linchast = 0;
+                    default:
+                        linchast = 0;
                         break;
                 }
                 t1.setText(String.valueOf(predOt));
                 t2.setText(String.valueOf(predDoo));
                 e.setText(String.valueOf(linchast));
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
@@ -374,7 +380,7 @@ public class MainActivity extends Activity {
     @Override
     public void onPause() {
         super.onPause();  // Always call the superclass method first
-        if (audioRecord!=null) {
+        if (audioRecord != null) {
             recordStop();
             readStop();
         }
@@ -383,7 +389,7 @@ public class MainActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
-        if (audioRecord!=null) {
+        if (audioRecord != null) {
             recordStart();
             readStart();
         }
@@ -392,7 +398,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (audioRecord!=null) {
+        if (audioRecord != null) {
             recordStop();
             readStop();
         }
@@ -407,6 +413,16 @@ public class MainActivity extends Activity {
                 channelConfig, audioFormat);
         int internalBufferSize = minInternalBufferSize * 4;
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 sampleRate, channelConfig, audioFormat, internalBufferSize);
         audioRecord.release();
